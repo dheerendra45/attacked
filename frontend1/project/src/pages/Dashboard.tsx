@@ -94,23 +94,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Upload */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <Upload className="mr-2 h-5 w-5" />
-            Quick Upload
-          </h2>
-          <FileUpload onFileSelect={handleQuickUpload} />
-          <div className="mt-4 text-center">
-            <Link 
-              to="/upload"
-              className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-            >
-              Or use full upload page →
-            </Link>
-          </div>
-        </div>
+     
 
         {/* Recent Briefings */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">

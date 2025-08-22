@@ -1,0 +1,98 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    environment:
+      - APP_ROLE=api
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/services
+      - DATABASE_URL=postgresql+psycopg2://postgres:${POSTGRES_PASSWORD}@postgres:5432/attacked
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_BUCKET=${MINIO_BUCKET:-attacked-artifacts}
+      - CONFIG_PATH=/app/configs/default.yml
+      - SEED=42
+      - USE_VENDOR_PROSODY=${USE_VENDOR_PROSODY:-false}
+      - USE_VENDOR_ASR=${USE_VENDOR_ASR:-false}
+      - HUME_API_KEY=${HUME_API_KEY:-}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY:-}
+      - ASSEMBLYAI_API_KEY=${ASSEMBLYAI_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+      - minio
+    volumes:
+      - attackedtmp:/tmp/attacked
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/Dockerfile
+    environment:
+      - APP_ROLE=worker
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/services
+      - DATABASE_URL=postgresql+psycopg2://postgres:${POSTGRES_PASSWORD}@postgres:5432/attacked
+      - REDIS_URL=redis://redis:6379/0
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - MINIO_BUCKET=${MINIO_BUCKET:-attacked-artifacts}
+      - CONFIG_PATH=/app/configs/default.yml
+      - SEED=42
+      - USE_VENDOR_PROSODY=${USE_VENDOR_PROSODY:-false}
+      - USE_VENDOR_ASR=${USE_VENDOR_ASR:-false}
+      - HUME_API_KEY=${HUME_API_KEY:-}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY:-}
+      - ASSEMBLYAI_API_KEY=${ASSEMBLYAI_API_KEY:-}
+    depends_on:
+      - redis
+      - postgres
+      - minio
+    volumes:
+      - attackedtmp:/tmp/attacked
+
+  redis:
+    image: redis:7-alpine
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=attacked
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio:/data
+
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb -p local/${MINIO_BUCKET:-attacked-artifacts} || true;
+      mc anonymous set none local/${MINIO_BUCKET:-attacked-artifacts};
+      exit 0;"
+
+volumes:
+  pgdata:
+  minio:
+  attackedtmp:

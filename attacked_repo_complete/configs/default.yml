@@ -1,0 +1,10 @@
+# configs/default.yml
+
+# --- retention policy ---
+retention:
+  result_ttl_days: ${RESULT_TTL_DAYS:-14}
+  purge_media: ${PURGE_MEDIA:-false}
+
+# --- vendor toggles (top-level) ---
+USE_VENDOR_PROSODY: true   # Hume prosody on
+USE_VENDOR_ASR: true       # Deepgram/AssemblyAI on

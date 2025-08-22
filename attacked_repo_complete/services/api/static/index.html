@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attacked.ai — Briefings</title>
+  <style>
+    body{font-family: system-ui, Arial, sans-serif; margin:2rem;}
+    .card{border:1px solid #ddd; border-radius:12px; padding:1rem; margin:0.5rem 0;}
+    .scores{display:flex; gap:1rem}
+    .tag{background:#f3f4f6; border-radius:8px; padding:0.2rem 0.5rem}
+  </style>
+</head>
+<body>
+  <h1>Attacked.ai — Briefings</h1>
+  <p><a href="/docs">Open API Docs</a></p>
+  <div id="list"></div>
+
+<script>
+async function load(){
+  const r = await fetch('/v1/briefings');
+  const data = await r.json();
+  const root = document.getElementById('list');
+  root.innerHTML = '';
+  data.forEach(b => {
+    const d = document.createElement('div'); d.className='card';
+    d.innerHTML = `<div><strong>${b.id}</strong></div>
+      <div class="scores">
+        <div class="tag">Composite: ${(b.scores?.composite??0).toFixed(2)}</div>
+        <div class="tag">Content: ${(b.scores?.content??0).toFixed(2)}</div>
+        <div class="tag">Delivery: ${(b.scores?.delivery??0).toFixed(2)}</div>
+        <div class="tag">Impact: ${(b.scores?.impact??0).toFixed(2)}</div>
+      </div>
+      <div><a href="/docs#/%2Fv1/get_v1_briefings__briefing_id_">View JSON</a></div>`;
+    root.appendChild(d);
+  })
+}
+load();
+</script>
+</body>
+</html>

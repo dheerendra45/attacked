@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://vietnam-biz-display-fallen.trycloudflare.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://success-ecommerce-scripts-bugs.trycloudflare.com';
 
 class APIError extends Error {
   constructor(message: string, public status?: number) {

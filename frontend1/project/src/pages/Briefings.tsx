@@ -27,6 +27,10 @@ export function Briefings() {
 
     loadBriefings();
   }, []);
+  const toPercent = (s?: number) => {
+  const v = (s ?? 0) / 5;            // <-- divide by 5 (0–500 -> 0–100)
+  return Math.max(0, Math.min(100, Math.round(v)));
+};
 
   const filteredBriefings = useMemo(() => {
     return briefings.filter((briefing) => {
@@ -44,7 +48,7 @@ export function Briefings() {
       }
 
       // Score filter
-      const compositeScore = (briefing.scores.composite || 0) * 100;
+    const compositeScore = toPercent(briefing.scores.composite);
       if (compositeScore < scoreRange.min || compositeScore > scoreRange.max) {
         return false;
       }
@@ -202,27 +206,28 @@ export function Briefings() {
 
                   <div className="flex items-center space-x-4">
                     <div className="grid grid-cols-3 gap-2">
-                      <ScoreBadge 
-                        score={briefing.scores.content || 0} 
-                        label="Content" 
-                        size="sm" 
-                      />
-                      <ScoreBadge 
-                        score={briefing.scores.delivery || 0} 
-                        label="Delivery" 
-                        size="sm" 
-                      />
-                      <ScoreBadge 
-                        score={briefing.scores.impact || 0} 
-                        label="Impact" 
-                        size="sm" 
-                      />
+                     <ScoreBadge 
+  score={toPercent(briefing.scores.content)} 
+  label="Content" 
+  size="sm" 
+/>
+<ScoreBadge 
+  score={toPercent(briefing.scores.delivery)} 
+  label="Delivery" 
+  size="sm" 
+/>
+<ScoreBadge 
+  score={toPercent(briefing.scores.impact)} 
+  label="Impact" 
+  size="sm" 
+/>
+
                     </div>
-                    <ScoreBadge 
-                      score={briefing.scores.composite || 0} 
-                      label="Composite" 
-                      size="md" 
-                    />
+                   <ScoreBadge 
+  score={toPercent(briefing.scores.composite)} 
+  label="Composite" 
+  size="md" 
+/>
                   </div>
                 </div>
               </div>
